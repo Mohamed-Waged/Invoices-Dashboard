@@ -31,10 +31,10 @@
 				<ul class="slide-menu">
 					<li><a class="slide-item" href="{{ url('/' . $page='invoices/create') }}">إضافة فاتورة</a></li>
 					<li><a class="slide-item" href="{{ url('/' . $page='invoices') }}">قائمة الفواتير</a></li>
-					<li><a class="slide-item" href="{{ url('/' . $page='chart-flot') }}">الفواتير المدفوعة</a></li>
-					<li><a class="slide-item" href="{{ url('/' . $page='chart-chartjs') }}">الفواتير الغير مدفوعة</a></li>
-					<li><a class="slide-item" href="{{ url('/' . $page='chart-echart') }}">الفواتير المدفوعة جزئيا</a></li>
-
+					<li><a class="slide-item" href="{{ url('/' . $page='Invoices_paid') }}">الفواتير المدفوعة</a></li>
+					<li><a class="slide-item" href="{{ url('/' . $page='Invoices_unpaid') }}">الفواتير الغير مدفوعة</a></li>
+					<li><a class="slide-item" href="{{ url('/' . $page='Invoices_partial') }}">الفواتير المدفوعة جزئيا</a></li>
+					<li><a class="slide-item" href="{{ url('/' . $page='archives') }}">أرشيف الفواتير</a></li>
 				</ul>
 			</li>
 
@@ -44,7 +44,6 @@
 				<ul class="slide-menu">
 					<li><a class="slide-item" href="{{ url('/' . $page='cards') }}">تقارير الفواتير</a></li>
 					<li><a class="slide-item" href="{{ url('/' . $page='darggablecards') }}">تقارير العملاء</a></li>
-
 				</ul>
 			</li>
 
@@ -55,7 +54,6 @@
 				<ul class="slide-menu">
 					<li><a class="slide-item" href="{{ url('/' . $page='mail') }}">قائمة المستخدمين</a></li>
 					<li><a class="slide-item" href="{{ url('/' . $page='mail-compose') }}">صلاحيات المستخدمين</a></li>
-
 				</ul>
 			</li>
 
