@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\InvoicesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
@@ -260,7 +262,6 @@ class InvoiceController extends Controller
     // Export All Invoices To Excel
     public function export() 
     {
-        dd("Installtion Error : ");
-        // return Excel::download(new InvoicesExport, 'invoices.xlsx');
+        return Excel::download(new InvoicesExport, 'Invoices.xlsx');
     }
 }
