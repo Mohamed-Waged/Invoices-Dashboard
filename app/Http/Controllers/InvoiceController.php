@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
-use App\Models\invoices_attachment;
-use App\Models\invoices_detail;
-use App\Models\Section;
 use App\Models\User;
+use App\Models\Invoice;
+use App\Models\Section;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use App\Exports\InvoicesExport;
+use App\Models\invoices_detail;
+use App\Notifications\AddInvoice;
+use Illuminate\Support\Facades\DB;
+use App\Models\invoices_attachment;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
+
 
 class InvoiceController extends Controller
 {
@@ -88,8 +91,13 @@ class InvoiceController extends Controller
             $imageName = $request->pic->getClientOriginalName();
             $request->pic->move(public_path('Attachments/' . $invoice_number), $imageName);
         }
-        
-        return back()->with('message','تم إضافة الفاتورة بنجاح');
+
+        // Add Notifications
+        $user = User::get();
+        $invoices = Invoice::latest()->first();
+        Notification::send($user, new AddInvoice($invoices));
+
+        return back()->with('message', 'تم إضافة الفاتورة بنجاح');
     }
 
     /**
@@ -113,15 +121,15 @@ class InvoiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request ,$id)
+    public function update(Request $request, $id)
     {
         $invoices = Invoice::findOrFail($id);
 
         $this->validate($request, [
-            'invoice_number' => 'unique:invoices,invoice_number,'.$id,
-            ], [
-                'invoice_number.unique' => 'رقم الفاتورة موجود بالفعل',
-            ]);
+            'invoice_number' => 'unique:invoices,invoice_number,' . $id,
+        ], [
+            'invoice_number.unique' => 'رقم الفاتورة موجود بالفعل',
+        ]);
 
         // Update Invoices Table
         $invoices->update([
@@ -150,9 +158,9 @@ class InvoiceController extends Controller
             'Value_Status' => 2,
             'note' => $request->note,
             'user' => (Auth::user()->name),
-        ]);        
+        ]);
 
-        return redirect()->route('invoices.index')->with('message','تم تعديل الفاتورة بنجاح');        
+        return redirect()->route('invoices.index')->with('message', 'تم تعديل الفاتورة بنجاح');
     }
 
     /**
@@ -162,22 +170,22 @@ class InvoiceController extends Controller
     {
         // Delete Invoice From Invoices Table
         $id = $request->invoice_id;
-        $invoice = Invoice::where('id',$id)->first();
+        $invoice = Invoice::where('id', $id)->first();
         $Details = invoices_attachment::where('invoice_id', $id)->first();
         if (!empty($Details->invoice_number)) {
             Storage::disk('public_uploads')->deleteDirectory($Details->invoice_number);
         }
         $invoice->forceDelete();
-        return redirect()->route('invoices.index')->with('message','تم حذف الفاتورة بنجاح');
+        return redirect()->route('invoices.index')->with('message', 'تم حذف الفاتورة بنجاح');
     }
 
     // Archive Invoice From Invoices Table (SoftDelete)
     public function archive(Request $request)
     {
         $id = $request->invoice_id;
-        $invoice = Invoice::where('id',$id)->first();
+        $invoice = Invoice::where('id', $id)->first();
         $invoice->delete();
-        return redirect()->route('invoices.index')->with('message','تم أرشفة الفاتورة بنجاح');
+        return redirect()->route('invoices.index')->with('message', 'تم أرشفة الفاتورة بنجاح');
     }
 
     // Return Product -> ( name , id ) ==> where id = $id
@@ -188,7 +196,7 @@ class InvoiceController extends Controller
     }
 
     // Update Status
-    public function Status_Update(Request $request,$id)
+    public function Status_Update(Request $request, $id)
     {
         $invoices = Invoice::findOrFail($id);
         if ($request->Status === 'مدفوعة') {
@@ -209,8 +217,7 @@ class InvoiceController extends Controller
                 'Payment_Date' => $request->Payment_Date,
                 'user' => (Auth::user()->name),
             ]);
-        }
-        else {
+        } else {
             $invoices->update([
                 'Value_Status' => 3,
                 'Status' => $request->Status,
@@ -228,28 +235,28 @@ class InvoiceController extends Controller
                 'user' => (Auth::user()->name),
             ]);
         }
-        return redirect()->route('invoices.index')->with('message','تم تعديل حالة الدفع بنجاح');
+        return redirect()->route('invoices.index')->with('message', 'تم تعديل حالة الدفع بنجاح');
     }
 
     // Return Paid Invoices
     public function Invoice_Paid()
     {
         $invoices = Invoice::where('Value_Status', 1)->get();
-        return view('invoices.invoices_paid',compact('invoices'));
+        return view('invoices.invoices_paid', compact('invoices'));
     }
 
     // Return UnPaid Invoices
     public function Invoice_UnPaid()
     {
-        $invoices = Invoice::where('Value_Status',2)->get();
-        return view('invoices.invoices_unpaid',compact('invoices'));
+        $invoices = Invoice::where('Value_Status', 2)->get();
+        return view('invoices.invoices_unpaid', compact('invoices'));
     }
 
     // Return Partial Invoices
     public function Invoice_Partial()
     {
-        $invoices = Invoice::where('Value_Status',3)->get();
-        return view('invoices.invoices_Partial',compact('invoices'));
+        $invoices = Invoice::where('Value_Status', 3)->get();
+        return view('invoices.invoices_Partial', compact('invoices'));
     }
 
     // Print Invoice
@@ -260,8 +267,32 @@ class InvoiceController extends Controller
     }
 
     // Export All Invoices To Excel
-    public function export() 
+    public function export()
     {
         return Excel::download(new InvoicesExport, 'Invoices.xlsx');
+    }
+
+    // Mark All Notifications as Read
+    public function MarkAsRead_all ()
+    {
+        $userUnreadNotification= auth()->user()->unreadNotifications;
+        if($userUnreadNotification) {
+            $userUnreadNotification->markAsRead();
+            return back();
+        }
+    }
+
+    // UnRead Notifications Count
+    public function unreadNotifications_count()
+    {
+        return auth()->user()->unreadNotifications->count();
+    }
+
+     // UnRead Notifications
+    public function unreadNotifications()
+    {
+        foreach (auth()->user()->unreadNotifications as $notification){
+            return $notification->data['title'];
+        }
     }
 }

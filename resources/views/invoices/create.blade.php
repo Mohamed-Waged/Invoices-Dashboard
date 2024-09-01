@@ -231,7 +231,6 @@
         });
     </script>
 
-
     {{-- Masked input for amount collection and commission --}}
     <script>
         function myFunction() {

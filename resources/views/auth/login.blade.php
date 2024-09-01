@@ -74,7 +74,7 @@
                                                     {{ __('تسجيل الدخول') }}
                                                 </button>
                                             </form>
-                                            <p class="text-center mt-3">ليس لدى حساب ؟  <a href="{{ route('register') }}">إنشاء حساب جديد</a></p>
+                                            {{-- <p class="text-center mt-3">ليس لدى حساب ؟  <a href="{{ route('register') }}">إنشاء حساب جديد</a></p> --}}
                                         </div>
                                     </div>
                                 </div>

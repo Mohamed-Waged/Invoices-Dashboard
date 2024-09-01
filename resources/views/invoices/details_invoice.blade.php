@@ -124,7 +124,7 @@
 
                                                         <tr>
                                                             <th scope="row">ملاحظات</th>
-                                                            <td>{{ $invoices->note }}</td>
+                                                            <td>{{ $invoices->note ?? ' - '}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -170,8 +170,8 @@
                                                                                 class="badge badge-pill badge-warning">{{ $detail->Status }}</span>
                                                                         </td>
                                                                     @endif
-                                                                <td>{{ $detail->Payment_Date }}</td>
-                                                                <td>{{ $detail->note }}</td>
+                                                                <td>{{ $detail->Payment_Date ?? ' - ' }}</td>
+                                                                <td>{{ $detail->note ?? ' - ' }}</td>
                                                                 <td>{{ $detail->created_at }}</td>
                                                                 <td>{{ $detail->user }}</td>
                                                             </tr>

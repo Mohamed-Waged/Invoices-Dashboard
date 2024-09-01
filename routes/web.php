@@ -1,15 +1,19 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\InvoicesArchiveController;
-use App\Http\Controllers\InvoicesAttachmentController;
-use App\Http\Controllers\InvoicesDetailController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\SectionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\CustomerReportController;
+use App\Http\Controllers\InvoicesReportController;
+use App\Http\Controllers\InvoicesDetailController;
+use App\Http\Controllers\InvoicesArchiveController;
+use App\Http\Controllers\InvoicesAttachmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,10 +54,25 @@ Route::middleware(['auth'])->group(function(){
         Route::post('delete_file', [InvoicesDetailController::class, 'destroy'])->name('delete_file');
         // /////////////
         Route::resource('InvoiceAttachments', InvoicesAttachmentController::class);
+
+        // Reports
+        Route::get('invoices_report', [InvoicesReportController::class , 'index']);
+        Route::post('Search_invoices', [InvoicesReportController::class , 'search']); 
+        
+        Route::get('customers_report', [CustomerReportController::class , 'index'])->name("customers_report");
+        Route::post('Search_customers', [CustomerReportController::class , 'search']);
+
+        // Notifications
+        Route::get('MarkAsRead_all', [InvoiceController::class , 'MarkAsRead_all'])->name('MarkAsRead_all');
+        Route::get('unreadNotifications_count', [InvoiceController::class , 'unreadNotifications_count'])->name('unreadNotifications_count');
+        Route::get('unreadNotifications', [InvoiceController::class , 'unreadNotifications'])->name('unreadNotifications');
+
+        Route::resource('roles',RoleController::class);
+        Route::resource('users',UserController::class);
 });
 
+Auth::routes(['register' => false]);
 
-Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::get('/{page}', [AdminController::class, 'index']);

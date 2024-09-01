@@ -74,7 +74,7 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $product->name }}</td>
                                     <td>{{ $product->section->name }}</td>
-                                    <td>{{ $product->description ?? 'لا يوجد' }}</td>
+                                    <td>{{ $product->description ?? '---' }}</td>
                                     <td>
                                         <button class="btn btn-outline-success btn-sm"
                                             data-name="{{ $product->name }}" data-id="{{ $product->id }}"

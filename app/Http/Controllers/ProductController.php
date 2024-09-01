@@ -66,17 +66,6 @@ class ProductController extends Controller
         $data['section_id'] = $id;
         $product->update($data);
         return back()->with('message', 'تم تعديل المنتج بنجاح');
-
-        
-        // $id = Section::where('name', $request->section_name)->first()->id;
-        // $Products = Product::findOrFail($request->id);
-        
-        // $Products->update([
-            //     'name' => $request->name,
-            //     'description' => $request->description,
-        //     'section_id' => $id,
-        // ]);
-        // return back()->with('message', 'تم تعديل المنتج بنجاح');
     }
 
     /**
